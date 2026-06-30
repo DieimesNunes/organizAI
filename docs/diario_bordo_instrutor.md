@@ -161,3 +161,31 @@ A nova tela permite selecionar um ambiente previamente cadastrado, informar turm
 Também foi implementada uma regra simples de verificação de conflitos. O sistema identifica quando uma tentativa de reserva utiliza o mesmo ambiente, na mesma data, em horários que se cruzam com uma reserva já existente.
 
 Essa etapa representa um avanço importante no protótipo, pois aproxima o sistema do problema real de gestão de salas e laboratórios.
+
+### 30/06/2026 - Preparação dos scripts SQL
+
+Foram preparados os primeiros scripts SQL do projeto OrganizAI.
+
+O arquivo `01_criar_tabelas.sql` contém a estrutura inicial do banco de dados, com as tabelas de ambientes e reservas.
+
+O arquivo `02_dados_exemplo.sql` contém dados fictícios de ambientes da unidade, permitindo realizar testes sem utilizar informações sensíveis.
+
+Essa etapa aproxima o projeto da unidade curricular de Banco de Dados, pois permite trabalhar conceitos como tabelas, campos, chave primária, chave estrangeira, tipos de dados e relacionamento entre entidades.
+
+### 30/06/2026 - Instalação do PostgreSQL
+
+Foi iniciada a configuração do PostgreSQL no Windows para integrar o projeto OrganizAI à unidade curricular de Banco de Dados.
+
+A escolha do PostgreSQL permite trabalhar conceitos importantes, como criação de banco de dados, tabelas, tipos de dados, chave primária, chave estrangeira e comandos SQL.
+
+Essa etapa será fundamental para substituir o armazenamento temporário do Streamlit por um banco de dados real.
+
+### 30/06/2026 - Teste de conexão entre Python e PostgreSQL
+
+Foi configurada a conexão entre o Python e o banco de dados PostgreSQL do projeto OrganizAI.
+
+Para isso, foi criado o arquivo `src/db.py`, responsável por centralizar a conexão com o banco. Também foi criado o arquivo `.env`, utilizado para armazenar as informações de acesso ao banco de dados sem expor a senha diretamente no código-fonte.
+
+Foi realizado um teste de conexão, confirmando que o Python consegue acessar o banco `organizai_db`.
+
+Essa etapa é importante porque prepara o projeto para substituir o armazenamento temporário do Streamlit por dados reais armazenados no PostgreSQL.

@@ -469,3 +469,13 @@ A tela de cadastro de ambientes deixou de utilizar apenas armazenamento temporá
 Também foi criada uma função específica no arquivo `src/ambientes.py` para cadastrar ambientes e outra para listar os ambientes já registrados no banco.
 
 Essa etapa é importante porque transforma o protótipo em uma aplicação com persistência de dados, aproximando o projeto de um sistema real e reforçando a integração entre as unidades curriculares de Python e Banco de Dados.
+
+### 30/06/2026 - Integração do cadastro de reservas com PostgreSQL
+
+Foi realizada a integração da funcionalidade de cadastro de reservas com o banco de dados PostgreSQL.
+
+A tela de cadastro de reservas passou a gravar os dados diretamente na tabela `reservas`, relacionando cada reserva com um ambiente previamente cadastrado na tabela `ambientes`.
+
+Também foi implementada a verificação de conflitos utilizando consulta ao banco de dados. Dessa forma, o sistema identifica se já existe uma reserva para o mesmo ambiente, na mesma data e em horário conflitante.
+
+Essa etapa fortalece a relação entre Python e Banco de Dados, pois demonstra o uso de chave estrangeira, relacionamento entre tabelas, inserção de registros, consulta com `JOIN` e validação de regras de negócio.

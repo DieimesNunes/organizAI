@@ -3,17 +3,13 @@ import pandas as pd
 from datetime import time
 
 from src.ambientes import cadastrar_ambiente, listar_ambientes
+from src.reservas import cadastrar_reserva, existe_conflito_reserva, listar_reservas
 
 st.set_page_config(
     page_title="OrganizAI",
     page_icon="🏫",
     layout="wide"
 )
-
-# As reservas ainda estão temporárias.
-# Depois também vamos gravar as reservas no PostgreSQL.
-if "reservas" not in st.session_state:
-    st.session_state.reservas = []
 
 
 def pagina_inicial():
@@ -145,20 +141,6 @@ def pagina_cadastro_ambientes():
         st.exception(erro)
 
 
-def existe_conflito(ambiente, data_reserva, hora_inicio, hora_fim):
-    for reserva in st.session_state.reservas:
-        mesma_sala = reserva["Ambiente"] == ambiente
-        mesma_data = reserva["Data"] == data_reserva
-
-        # Existe conflito quando os horários se cruzam.
-        horarios_cruzam = hora_inicio < reserva["Fim"] and hora_fim > reserva["Início"]
-
-        if mesma_sala and mesma_data and horarios_cruzam:
-            return True
-
-    return False
-
-
 def pagina_cadastro_reservas():
     st.title("📅 Cadastro de Reservas")
     st.write("Nesta tela será possível registrar o uso de salas e laboratórios.")
@@ -176,10 +158,13 @@ def pagina_cadastro_reservas():
         st.warning("Antes de cadastrar uma reserva, cadastre pelo menos um ambiente.")
         return
 
-    nomes_ambientes = [ambiente["nome"] for ambiente in ambientes]
-
     with st.form("form_cadastro_reserva"):
-        ambiente = st.selectbox("Ambiente", nomes_ambientes)
+        ambiente_selecionado = st.selectbox(
+            "Ambiente",
+            ambientes,
+            format_func=lambda ambiente: ambiente["nome"]
+        )
+
         turma = st.text_input("Turma", placeholder="Exemplo: 202600049 - Técnico em IA")
         instrutor = st.text_input("Instrutor", placeholder="Exemplo: Dieimes Nunes")
         unidade_curricular = st.text_input("Unidade curricular", placeholder="Exemplo: Python")
@@ -191,40 +176,68 @@ def pagina_cadastro_reservas():
         botao_cadastrar = st.form_submit_button("Cadastrar reserva")
 
         if botao_cadastrar:
+            ambiente_id = ambiente_selecionado["id"]
+
             if turma.strip() == "":
                 st.error("Informe a turma.")
             elif instrutor.strip() == "":
                 st.error("Informe o instrutor.")
             elif hora_fim <= hora_inicio:
                 st.error("O horário de término deve ser maior que o horário de início.")
-            elif existe_conflito(ambiente, data_reserva, hora_inicio, hora_fim):
+            elif existe_conflito_reserva(ambiente_id, data_reserva, hora_inicio, hora_fim):
                 st.error("Conflito encontrado! Esse ambiente já possui reserva nessa data e horário.")
             else:
-                reserva = {
-                    "Ambiente": ambiente,
-                    "Turma": turma,
-                    "Instrutor": instrutor,
-                    "Unidade Curricular": unidade_curricular,
-                    "Data": data_reserva,
-                    "Início": hora_inicio,
-                    "Fim": hora_fim,
-                    "Finalidade": finalidade
-                }
+                try:
+                    id_criado = cadastrar_reserva(
+                        ambiente_id=ambiente_id,
+                        turma=turma,
+                        instrutor=instrutor,
+                        unidade_curricular=unidade_curricular,
+                        data_reserva=data_reserva,
+                        hora_inicio=hora_inicio,
+                        hora_fim=hora_fim,
+                        finalidade=finalidade
+                    )
 
-                st.session_state.reservas.append(reserva)
-                st.success("Reserva cadastrada com sucesso!")
+                    st.success(f"Reserva cadastrada com sucesso! ID gerado: {id_criado}")
+
+                except Exception as erro:
+                    st.error("Erro ao cadastrar reserva no banco de dados.")
+                    st.exception(erro)
 
     st.divider()
 
-    st.header("Reservas cadastradas")
+    st.header("Reservas cadastradas no banco de dados")
 
-    if len(st.session_state.reservas) == 0:
-        st.info("Nenhuma reserva cadastrada até o momento.")
-    else:
-        tabela_reservas = pd.DataFrame(st.session_state.reservas)
-        st.dataframe(tabela_reservas, use_container_width=True, hide_index=True)
+    try:
+        reservas = listar_reservas()
 
-        st.write(f"Total de reservas cadastradas: **{len(st.session_state.reservas)}**")
+        if len(reservas) == 0:
+            st.info("Nenhuma reserva cadastrada até o momento.")
+        else:
+            tabela_reservas = pd.DataFrame(reservas)
+
+            tabela_reservas = tabela_reservas.rename(
+                columns={
+                    "id": "ID",
+                    "ambiente": "Ambiente",
+                    "turma": "Turma",
+                    "instrutor": "Instrutor",
+                    "unidade_curricular": "Unidade Curricular",
+                    "data_reserva": "Data",
+                    "hora_inicio": "Início",
+                    "hora_fim": "Fim",
+                    "finalidade": "Finalidade"
+                }
+            )
+
+            st.dataframe(tabela_reservas, use_container_width=True, hide_index=True)
+
+            st.write(f"Total de reservas cadastradas: **{len(reservas)}**")
+
+    except Exception as erro:
+        st.error("Erro ao listar reservas cadastradas.")
+        st.exception(erro)
 
 
 def pagina_consulta_agenda():
@@ -233,13 +246,20 @@ def pagina_consulta_agenda():
 
     st.divider()
 
-    if len(st.session_state.reservas) == 0:
+    try:
+        reservas = listar_reservas()
+    except Exception as erro:
+        st.error("Erro ao buscar reservas no banco de dados.")
+        st.exception(erro)
+        return
+
+    if len(reservas) == 0:
         st.info("Nenhuma reserva cadastrada até o momento.")
         return
 
-    tabela_reservas = pd.DataFrame(st.session_state.reservas)
+    tabela_reservas = pd.DataFrame(reservas)
 
-    ambientes = ["Todos"] + sorted(tabela_reservas["Ambiente"].unique().tolist())
+    ambientes = ["Todos"] + sorted(tabela_reservas["ambiente"].unique().tolist())
     ambiente_filtro = st.selectbox("Filtrar por ambiente", ambientes)
 
     data_filtro = st.date_input("Filtrar por data")
@@ -247,9 +267,23 @@ def pagina_consulta_agenda():
     tabela_filtrada = tabela_reservas.copy()
 
     if ambiente_filtro != "Todos":
-        tabela_filtrada = tabela_filtrada[tabela_filtrada["Ambiente"] == ambiente_filtro]
+        tabela_filtrada = tabela_filtrada[tabela_filtrada["ambiente"] == ambiente_filtro]
 
-    tabela_filtrada = tabela_filtrada[tabela_filtrada["Data"] == data_filtro]
+    tabela_filtrada = tabela_filtrada[tabela_filtrada["data_reserva"] == data_filtro]
+
+    tabela_filtrada = tabela_filtrada.rename(
+        columns={
+            "id": "ID",
+            "ambiente": "Ambiente",
+            "turma": "Turma",
+            "instrutor": "Instrutor",
+            "unidade_curricular": "Unidade Curricular",
+            "data_reserva": "Data",
+            "hora_inicio": "Início",
+            "hora_fim": "Fim",
+            "finalidade": "Finalidade"
+        }
+    )
 
     st.header("Resultado da consulta")
 

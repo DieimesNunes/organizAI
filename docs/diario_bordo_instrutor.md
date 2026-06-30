@@ -133,3 +133,21 @@ A tela inicial apresenta o nome do projeto, sua finalidade, o objetivo do sistem
 Também foi registrado um print da primeira tela do sistema na pasta imagens, servindo como evidência do andamento inicial do protótipo.
 
 Essa etapa marcou o início prático do desenvolvimento da solução.
+
+### 30/06/2026 - Envio do projeto para o GitHub
+
+O projeto OrganizAI foi enviado para um repositório no GitHub, permitindo o registro do histórico de desenvolvimento e a organização dos arquivos do protótipo.
+
+O repositório contém a estrutura inicial do projeto, incluindo documentação, arquivos SQL, código-fonte em Python, imagem da primeira tela, arquivo de dependências e configuração do Git.
+
+Essa etapa é importante para documentar o andamento do projeto, facilitar o acompanhamento das alterações e permitir que os estudantes visualizem a evolução da solução.
+
+### 30/06/2026 - Criação da tela de cadastro de ambientes
+
+Foi criada a primeira funcionalidade prática do protótipo OrganizAI: a tela de cadastro de ambientes.
+
+A tela permite registrar informações como nome do ambiente, tipo, capacidade, presença de computadores, presença de projetor e observações.
+
+Nesta etapa, os dados ainda são armazenados temporariamente dentro da aplicação, utilizando o recurso `session_state` do Streamlit. Também foi utilizado o Pandas para exibir os ambientes cadastrados em formato de tabela.
+
+Essa funcionalidade servirá como base para, posteriormente, integrar o sistema ao banco de dados PostgreSQL.

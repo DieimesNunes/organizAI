@@ -151,3 +151,13 @@ A tela permite registrar informações como nome do ambiente, tipo, capacidade, 
 Nesta etapa, os dados ainda são armazenados temporariamente dentro da aplicação, utilizando o recurso `session_state` do Streamlit. Também foi utilizado o Pandas para exibir os ambientes cadastrados em formato de tabela.
 
 Essa funcionalidade servirá como base para, posteriormente, integrar o sistema ao banco de dados PostgreSQL.
+
+### 30/06/2026 - Cadastro de reservas e verificação de conflitos
+
+Foi criada a funcionalidade de cadastro de reservas no protótipo OrganizAI.
+
+A nova tela permite selecionar um ambiente previamente cadastrado, informar turma, instrutor, unidade curricular, data, horário de início, horário de término e finalidade da reserva.
+
+Também foi implementada uma regra simples de verificação de conflitos. O sistema identifica quando uma tentativa de reserva utiliza o mesmo ambiente, na mesma data, em horários que se cruzam com uma reserva já existente.
+
+Essa etapa representa um avanço importante no protótipo, pois aproxima o sistema do problema real de gestão de salas e laboratórios.

@@ -6,6 +6,12 @@ from datetime import time
 from src.ambientes import cadastrar_ambiente, listar_ambientes
 from src.reservas import cadastrar_reserva, existe_conflito_reserva, listar_reservas
 from src.sugestoes import sugerir_ambientes
+from src.relatorios import (
+    obter_resumo_geral,
+    listar_reservas_por_ambiente,
+    listar_ambientes_por_tipo,
+    listar_reservas_por_data
+)
 
 st.set_page_config(
     page_title="OrganizAI",
@@ -362,6 +368,113 @@ def pagina_sugestao_ambiente():
                 except Exception as erro:
                     st.error("Erro ao buscar sugestões de ambientes.")
                     st.exception(erro)
+def pagina_relatorios():
+    st.title("📊 Relatórios do OrganizAI")
+    st.write(
+        """
+        Nesta tela são apresentados relatórios simples sobre os ambientes
+        e reservas cadastrados no sistema.
+        """
+    )
+
+    st.divider()
+
+    try:
+        resumo = obter_resumo_geral()
+
+        coluna1, coluna2 = st.columns(2)
+
+        with coluna1:
+            st.metric("Total de ambientes", resumo["total_ambientes"])
+
+        with coluna2:
+            st.metric("Total de reservas", resumo["total_reservas"])
+
+    except Exception as erro:
+        st.error("Erro ao carregar resumo geral.")
+        st.exception(erro)
+        return
+
+    st.divider()
+
+    st.header("Reservas por ambiente")
+
+    try:
+        dados_ambiente = listar_reservas_por_ambiente()
+
+        if len(dados_ambiente) == 0:
+            st.info("Nenhum dado encontrado.")
+        else:
+            tabela_ambiente = pd.DataFrame(dados_ambiente)
+            tabela_ambiente = tabela_ambiente.rename(
+                columns={
+                    "ambiente": "Ambiente",
+                    "total_reservas": "Total de Reservas"
+                }
+            )
+
+            st.dataframe(tabela_ambiente, use_container_width=True, hide_index=True)
+
+            grafico_ambiente = tabela_ambiente.set_index("Ambiente")
+            st.bar_chart(grafico_ambiente)
+
+    except Exception as erro:
+        st.error("Erro ao carregar reservas por ambiente.")
+        st.exception(erro)
+
+    st.divider()
+
+    st.header("Ambientes por tipo")
+
+    try:
+        dados_tipo = listar_ambientes_por_tipo()
+
+        if len(dados_tipo) == 0:
+            st.info("Nenhum dado encontrado.")
+        else:
+            tabela_tipo = pd.DataFrame(dados_tipo)
+            tabela_tipo = tabela_tipo.rename(
+                columns={
+                    "tipo": "Tipo",
+                    "total": "Total"
+                }
+            )
+
+            st.dataframe(tabela_tipo, use_container_width=True, hide_index=True)
+
+            grafico_tipo = tabela_tipo.set_index("Tipo")
+            st.bar_chart(grafico_tipo)
+
+    except Exception as erro:
+        st.error("Erro ao carregar ambientes por tipo.")
+        st.exception(erro)
+
+    st.divider()
+
+    st.header("Reservas por data")
+
+    try:
+        dados_data = listar_reservas_por_data()
+
+        if len(dados_data) == 0:
+            st.info("Nenhuma reserva cadastrada por data.")
+        else:
+            tabela_data = pd.DataFrame(dados_data)
+            tabela_data = tabela_data.rename(
+                columns={
+                    "data_reserva": "Data",
+                    "total_reservas": "Total de Reservas"
+                }
+            )
+
+            st.dataframe(tabela_data, use_container_width=True, hide_index=True)
+
+            grafico_data = tabela_data.set_index("Data")
+            st.bar_chart(grafico_data)
+
+    except Exception as erro:
+        st.error("Erro ao carregar reservas por data.")
+        st.exception(erro)
 
 st.sidebar.title("Menu")
 
@@ -372,7 +485,8 @@ pagina = st.sidebar.radio(
         "Cadastro de ambientes",
         "Cadastro de reservas",
         "Consulta de agenda",
-        "Sugestão de ambiente"
+        "Sugestão de ambiente",
+        "Relatórios"
     ]
 )
 
@@ -386,3 +500,5 @@ elif pagina == "Consulta de agenda":
     pagina_consulta_agenda()
 elif pagina == "Sugestão de ambiente":
     pagina_sugestao_ambiente()
+elif pagina == "Relatórios":
+    pagina_relatorios()

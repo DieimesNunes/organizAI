@@ -489,3 +489,13 @@ A nova tela permite informar data, horário, capacidade mínima e recursos neces
 A consulta também verifica se o ambiente já possui reserva no mesmo dia e em horário conflitante, evitando sugestões incorretas.
 
 Essa funcionalidade representa uma evolução importante do protótipo, pois aproxima o sistema de uma solução inteligente de apoio à tomada de decisão na organização de salas e laboratórios.
+
+### 30/06/2026 - Criação da tela de relatórios
+
+Foi criada a tela de relatórios do projeto OrganizAI.
+
+A nova funcionalidade apresenta informações gerais do sistema, como total de ambientes cadastrados e total de reservas registradas.
+
+Também foram criados relatórios de reservas por ambiente, ambientes por tipo e reservas por data. Os dados são consultados no PostgreSQL e organizados em tabelas com o apoio da biblioteca Pandas.
+
+Essa etapa contribui para a visualização dos dados do sistema e demonstra como as informações armazenadas no banco podem apoiar análises e tomadas de decisão.

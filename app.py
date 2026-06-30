@@ -2,8 +2,10 @@ import streamlit as st
 import pandas as pd
 from datetime import time
 
+
 from src.ambientes import cadastrar_ambiente, listar_ambientes
 from src.reservas import cadastrar_reserva, existe_conflito_reserva, listar_reservas
+from src.sugestoes import sugerir_ambientes
 
 st.set_page_config(
     page_title="OrganizAI",
@@ -292,6 +294,74 @@ def pagina_consulta_agenda():
     else:
         st.dataframe(tabela_filtrada, use_container_width=True, hide_index=True)
 
+def pagina_sugestao_ambiente():
+    st.title("🤖 Sugestão de Ambiente Disponível")
+    st.write(
+        """
+        Nesta tela, o sistema sugere salas ou laboratórios disponíveis
+        com base na data, horário, capacidade e recursos necessários.
+        """
+    )
+
+    st.divider()
+
+    with st.form("form_sugestao_ambiente"):
+        data_reserva = st.date_input("Data desejada")
+        hora_inicio = st.time_input("Horário de início", value=time(7, 15))
+        hora_fim = st.time_input("Horário de término", value=time(12, 35))
+
+        capacidade_minima = st.number_input(
+            "Capacidade mínima necessária",
+            min_value=1,
+            max_value=100,
+            value=20
+        )
+
+        precisa_computadores = st.checkbox("Precisa de computadores?")
+        precisa_projetor = st.checkbox("Precisa de projetor?")
+
+        botao_sugerir = st.form_submit_button("Buscar ambientes disponíveis")
+
+        if botao_sugerir:
+            if hora_fim <= hora_inicio:
+                st.error("O horário de término deve ser maior que o horário de início.")
+            else:
+                try:
+                    ambientes = sugerir_ambientes(
+                        data_reserva=data_reserva,
+                        hora_inicio=hora_inicio,
+                        hora_fim=hora_fim,
+                        capacidade_minima=capacidade_minima,
+                        precisa_computadores=precisa_computadores,
+                        precisa_projetor=precisa_projetor
+                    )
+
+                    st.divider()
+                    st.header("Ambientes sugeridos")
+
+                    if len(ambientes) == 0:
+                        st.warning("Nenhum ambiente disponível foi encontrado para os critérios informados.")
+                    else:
+                        tabela_ambientes = pd.DataFrame(ambientes)
+
+                        tabela_ambientes = tabela_ambientes.rename(
+                            columns={
+                                "id": "ID",
+                                "nome": "Nome",
+                                "tipo": "Tipo",
+                                "capacidade": "Capacidade",
+                                "possui_computadores": "Possui computadores",
+                                "possui_projetor": "Possui projetor",
+                                "observacao": "Observação"
+                            }
+                        )
+
+                        st.success(f"Foram encontrados {len(ambientes)} ambiente(s) disponível(is).")
+                        st.dataframe(tabela_ambientes, use_container_width=True, hide_index=True)
+
+                except Exception as erro:
+                    st.error("Erro ao buscar sugestões de ambientes.")
+                    st.exception(erro)
 
 st.sidebar.title("Menu")
 
@@ -301,7 +371,8 @@ pagina = st.sidebar.radio(
         "Página inicial",
         "Cadastro de ambientes",
         "Cadastro de reservas",
-        "Consulta de agenda"
+        "Consulta de agenda",
+        "Sugestão de ambiente"
     ]
 )
 
@@ -313,3 +384,5 @@ elif pagina == "Cadastro de reservas":
     pagina_cadastro_reservas()
 elif pagina == "Consulta de agenda":
     pagina_consulta_agenda()
+elif pagina == "Sugestão de ambiente":
+    pagina_sugestao_ambiente()

@@ -479,3 +479,13 @@ A tela de cadastro de reservas passou a gravar os dados diretamente na tabela `r
 Também foi implementada a verificação de conflitos utilizando consulta ao banco de dados. Dessa forma, o sistema identifica se já existe uma reserva para o mesmo ambiente, na mesma data e em horário conflitante.
 
 Essa etapa fortalece a relação entre Python e Banco de Dados, pois demonstra o uso de chave estrangeira, relacionamento entre tabelas, inserção de registros, consulta com `JOIN` e validação de regras de negócio.
+
+### 30/06/2026 - Criação da sugestão de ambiente disponível
+
+Foi criada a funcionalidade de sugestão de ambiente disponível no protótipo OrganizAI.
+
+A nova tela permite informar data, horário, capacidade mínima e recursos necessários, como computadores e projetor. Com base nesses critérios, o sistema consulta o banco de dados PostgreSQL e retorna os ambientes disponíveis.
+
+A consulta também verifica se o ambiente já possui reserva no mesmo dia e em horário conflitante, evitando sugestões incorretas.
+
+Essa funcionalidade representa uma evolução importante do protótipo, pois aproxima o sistema de uma solução inteligente de apoio à tomada de decisão na organização de salas e laboratórios.

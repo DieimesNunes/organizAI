@@ -2,17 +2,16 @@ import streamlit as st
 import pandas as pd
 from datetime import time
 
+from src.ambientes import cadastrar_ambiente, listar_ambientes
+
 st.set_page_config(
     page_title="OrganizAI",
     page_icon="🏫",
     layout="wide"
 )
 
-# Dados temporários.
-# Depois vamos trocar pelo PostgreSQL.
-if "ambientes" not in st.session_state:
-    st.session_state.ambientes = []
-
+# As reservas ainda estão temporárias.
+# Depois também vamos gravar as reservas no PostgreSQL.
 if "reservas" not in st.session_state:
     st.session_state.reservas = []
 
@@ -64,14 +63,32 @@ def pagina_cadastro_ambientes():
 
     with st.form("form_cadastro_ambiente"):
         nome = st.text_input("Nome do ambiente", placeholder="Exemplo: Sala 03")
+
         tipo = st.selectbox(
             "Tipo de ambiente",
-            ["Sala de aula", "Laboratório de informática", "Laboratório de hardware", "Auditório", "Outro"]
+            [
+                "Sala de aula",
+                "Laboratório de informática",
+                "Laboratório de hardware",
+                "Auditório",
+                "Outro"
+            ]
         )
-        capacidade = st.number_input("Capacidade de pessoas", min_value=1, max_value=100, value=20)
+
+        capacidade = st.number_input(
+            "Capacidade de pessoas",
+            min_value=1,
+            max_value=100,
+            value=20
+        )
+
         possui_computadores = st.checkbox("Possui computadores?")
         possui_projetor = st.checkbox("Possui projetor?")
-        observacao = st.text_area("Observação", placeholder="Exemplo: ambiente usado para aulas práticas.")
+
+        observacao = st.text_area(
+            "Observação",
+            placeholder="Exemplo: ambiente usado para aulas práticas."
+        )
 
         botao_cadastrar = st.form_submit_button("Cadastrar ambiente")
 
@@ -79,29 +96,53 @@ def pagina_cadastro_ambientes():
             if nome.strip() == "":
                 st.error("Informe o nome do ambiente.")
             else:
-                ambiente = {
-                    "Nome": nome,
-                    "Tipo": tipo,
-                    "Capacidade": capacidade,
-                    "Possui computadores": "Sim" if possui_computadores else "Não",
-                    "Possui projetor": "Sim" if possui_projetor else "Não",
-                    "Observação": observacao
-                }
+                try:
+                    id_criado = cadastrar_ambiente(
+                        nome=nome,
+                        tipo=tipo,
+                        capacidade=capacidade,
+                        possui_computadores=possui_computadores,
+                        possui_projetor=possui_projetor,
+                        observacao=observacao
+                    )
 
-                st.session_state.ambientes.append(ambiente)
-                st.success(f"Ambiente '{nome}' cadastrado com sucesso!")
+                    st.success(f"Ambiente '{nome}' cadastrado com sucesso! ID gerado: {id_criado}")
+
+                except Exception as erro:
+                    st.error("Erro ao cadastrar ambiente no banco de dados.")
+                    st.exception(erro)
 
     st.divider()
 
-    st.header("Ambientes cadastrados")
+    st.header("Ambientes cadastrados no banco de dados")
 
-    if len(st.session_state.ambientes) == 0:
-        st.info("Nenhum ambiente cadastrado até o momento.")
-    else:
-        tabela_ambientes = pd.DataFrame(st.session_state.ambientes)
-        st.dataframe(tabela_ambientes, use_container_width=True)
+    try:
+        ambientes = listar_ambientes()
 
-        st.write(f"Total de ambientes cadastrados: **{len(st.session_state.ambientes)}**")
+        if len(ambientes) == 0:
+            st.info("Nenhum ambiente cadastrado até o momento.")
+        else:
+            tabela_ambientes = pd.DataFrame(ambientes)
+
+            tabela_ambientes = tabela_ambientes.rename(
+                columns={
+                    "id": "ID",
+                    "nome": "Nome",
+                    "tipo": "Tipo",
+                    "capacidade": "Capacidade",
+                    "possui_computadores": "Possui computadores",
+                    "possui_projetor": "Possui projetor",
+                    "observacao": "Observação"
+                }
+            )
+
+            st.dataframe(tabela_ambientes, use_container_width=True, hide_index=True)
+
+            st.write(f"Total de ambientes cadastrados: **{len(ambientes)}**")
+
+    except Exception as erro:
+        st.error("Erro ao listar ambientes cadastrados.")
+        st.exception(erro)
 
 
 def existe_conflito(ambiente, data_reserva, hora_inicio, hora_fim):
@@ -124,11 +165,18 @@ def pagina_cadastro_reservas():
 
     st.divider()
 
-    if len(st.session_state.ambientes) == 0:
+    try:
+        ambientes = listar_ambientes()
+    except Exception as erro:
+        st.error("Erro ao buscar ambientes no banco de dados.")
+        st.exception(erro)
+        return
+
+    if len(ambientes) == 0:
         st.warning("Antes de cadastrar uma reserva, cadastre pelo menos um ambiente.")
         return
 
-    nomes_ambientes = [ambiente["Nome"] for ambiente in st.session_state.ambientes]
+    nomes_ambientes = [ambiente["nome"] for ambiente in ambientes]
 
     with st.form("form_cadastro_reserva"):
         ambiente = st.selectbox("Ambiente", nomes_ambientes)
@@ -174,7 +222,7 @@ def pagina_cadastro_reservas():
         st.info("Nenhuma reserva cadastrada até o momento.")
     else:
         tabela_reservas = pd.DataFrame(st.session_state.reservas)
-        st.dataframe(tabela_reservas, use_container_width=True)
+        st.dataframe(tabela_reservas, use_container_width=True, hide_index=True)
 
         st.write(f"Total de reservas cadastradas: **{len(st.session_state.reservas)}**")
 
@@ -208,10 +256,11 @@ def pagina_consulta_agenda():
     if len(tabela_filtrada) == 0:
         st.warning("Nenhuma reserva encontrada para os filtros selecionados.")
     else:
-        st.dataframe(tabela_filtrada, use_container_width=True)
+        st.dataframe(tabela_filtrada, use_container_width=True, hide_index=True)
 
 
 st.sidebar.title("Menu")
+
 pagina = st.sidebar.radio(
     "Escolha uma opção:",
     [

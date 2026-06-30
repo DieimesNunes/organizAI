@@ -458,3 +458,14 @@ A intervenção do instrutor foi necessária para estruturar tecnicamente o proj
 A partir dessa base, os estudantes poderão participar de forma mais objetiva, realizando testes, explicando as funcionalidades, registrando evidências e colaborando na construção da versão final do protótipo.
 
 O projeto segue alinhado às unidades curriculares de Python e Banco de Dados, além de responder a uma necessidade real da unidade: melhorar a organização de salas e laboratórios do Senac Ivaiporã.
+
+
+### 30/06/2026 - Integração do cadastro de ambientes com PostgreSQL
+
+Foi realizada a primeira integração prática entre a interface em Streamlit e o banco de dados PostgreSQL.
+
+A tela de cadastro de ambientes deixou de utilizar apenas armazenamento temporário e passou a gravar os dados diretamente na tabela `ambientes` do banco `organizai_db`.
+
+Também foi criada uma função específica no arquivo `src/ambientes.py` para cadastrar ambientes e outra para listar os ambientes já registrados no banco.
+
+Essa etapa é importante porque transforma o protótipo em uma aplicação com persistência de dados, aproximando o projeto de um sistema real e reforçando a integração entre as unidades curriculares de Python e Banco de Dados.

@@ -3,8 +3,23 @@ import pandas as pd
 from datetime import time
 
 
-from src.ambientes import cadastrar_ambiente, listar_ambientes
-from src.reservas import cadastrar_reserva, existe_conflito_reserva, listar_reservas
+from src.ambientes import (
+    cadastrar_ambiente,
+    listar_ambientes,
+    obter_ambiente_por_id,
+    atualizar_ambiente,
+    contar_reservas_por_ambiente,
+    excluir_ambiente
+)
+from src.reservas import (
+    cadastrar_reserva,
+    existe_conflito_reserva,
+    existe_conflito_reserva_edicao,
+    listar_reservas,
+    obter_reserva_por_id,
+    atualizar_reserva,
+    excluir_reserva
+)
 from src.sugestoes import sugerir_ambientes
 from src.relatorios import (
     obter_resumo_geral,
@@ -475,6 +490,291 @@ def pagina_relatorios():
     except Exception as erro:
         st.error("Erro ao carregar reservas por data.")
         st.exception(erro)
+def pagina_gerenciar_ambientes():
+    st.title("🛠️ Gerenciar Ambientes")
+    st.write("Nesta tela é possível editar ou excluir ambientes cadastrados.")
+
+    st.divider()
+
+    try:
+        ambientes = listar_ambientes()
+    except Exception as erro:
+        st.error("Erro ao buscar ambientes no banco de dados.")
+        st.exception(erro)
+        return
+
+    if len(ambientes) == 0:
+        st.info("Nenhum ambiente cadastrado até o momento.")
+        return
+
+    aba_editar, aba_excluir = st.tabs(["Editar ambiente", "Excluir ambiente"])
+
+    with aba_editar:
+        st.subheader("Editar ambiente")
+
+        ambiente_selecionado = st.selectbox(
+            "Selecione o ambiente que deseja editar",
+            ambientes,
+            format_func=lambda ambiente: f'{ambiente["id"]} - {ambiente["nome"]}',
+            key="select_editar_ambiente"
+        )
+
+        ambiente_completo = obter_ambiente_por_id(ambiente_selecionado["id"])
+
+        tipos = [
+            "Sala de aula",
+            "Laboratório de informática",
+            "Laboratório de hardware",
+            "Auditório",
+            "Outro"
+        ]
+
+        indice_tipo = tipos.index(ambiente_completo["tipo"]) if ambiente_completo["tipo"] in tipos else 0
+
+        with st.form("form_editar_ambiente"):
+            nome = st.text_input("Nome do ambiente", value=ambiente_completo["nome"])
+
+            tipo = st.selectbox(
+                "Tipo de ambiente",
+                tipos,
+                index=indice_tipo
+            )
+
+            capacidade = st.number_input(
+                "Capacidade de pessoas",
+                min_value=1,
+                max_value=100,
+                value=ambiente_completo["capacidade"]
+            )
+
+            possui_computadores = st.checkbox(
+                "Possui computadores?",
+                value=ambiente_completo["possui_computadores"]
+            )
+
+            possui_projetor = st.checkbox(
+                "Possui projetor?",
+                value=ambiente_completo["possui_projetor"]
+            )
+
+            observacao = st.text_area(
+                "Observação",
+                value=ambiente_completo["observacao"]
+            )
+
+            botao_salvar = st.form_submit_button("Salvar alterações")
+
+            if botao_salvar:
+                if nome.strip() == "":
+                    st.error("Informe o nome do ambiente.")
+                else:
+                    try:
+                        atualizar_ambiente(
+                            ambiente_id=ambiente_completo["id"],
+                            nome=nome,
+                            tipo=tipo,
+                            capacidade=capacidade,
+                            possui_computadores=possui_computadores,
+                            possui_projetor=possui_projetor,
+                            observacao=observacao
+                        )
+
+                        st.success("Ambiente atualizado com sucesso!")
+                        st.rerun()
+
+                    except Exception as erro:
+                        st.error("Erro ao atualizar ambiente.")
+                        st.exception(erro)
+
+    with aba_excluir:
+        st.subheader("Excluir ambiente")
+        st.warning(
+            """
+            Atenção: um ambiente só deve ser excluído se não possuir reservas cadastradas.
+            Isso evita problemas no relacionamento entre as tabelas do banco de dados.
+            """
+        )
+
+        ambiente_excluir = st.selectbox(
+            "Selecione o ambiente que deseja excluir",
+            ambientes,
+            format_func=lambda ambiente: f'{ambiente["id"]} - {ambiente["nome"]}',
+            key="select_excluir_ambiente"
+        )
+
+        total_reservas = contar_reservas_por_ambiente(ambiente_excluir["id"])
+
+        st.write(f"Reservas vinculadas a este ambiente: **{total_reservas}**")
+
+        confirmar = st.checkbox(
+            "Confirmo que desejo excluir este ambiente.",
+            key="confirmar_excluir_ambiente"
+        )
+
+        if st.button("Excluir ambiente"):
+            if not confirmar:
+                st.error("Marque a confirmação antes de excluir.")
+            elif total_reservas > 0:
+                st.error(
+                    "Este ambiente possui reservas vinculadas e não pode ser excluído. "
+                    "Exclua as reservas primeiro ou mantenha o ambiente cadastrado."
+                )
+            else:
+                try:
+                    excluir_ambiente(ambiente_excluir["id"])
+                    st.success("Ambiente excluído com sucesso!")
+                    st.rerun()
+
+                except Exception as erro:
+                    st.error("Erro ao excluir ambiente.")
+                    st.exception(erro)
+def pagina_gerenciar_reservas():
+    st.title("🛠️ Gerenciar Reservas")
+    st.write("Nesta tela é possível editar ou excluir reservas cadastradas.")
+
+    st.divider()
+
+    try:
+        reservas = listar_reservas()
+        ambientes = listar_ambientes()
+    except Exception as erro:
+        st.error("Erro ao buscar dados no banco de dados.")
+        st.exception(erro)
+        return
+
+    if len(reservas) == 0:
+        st.info("Nenhuma reserva cadastrada até o momento.")
+        return
+
+    if len(ambientes) == 0:
+        st.warning("Não existem ambientes cadastrados.")
+        return
+
+    aba_editar, aba_excluir = st.tabs(["Editar reserva", "Excluir reserva"])
+
+    with aba_editar:
+        st.subheader("Editar reserva")
+
+        reserva_selecionada = st.selectbox(
+            "Selecione a reserva que deseja editar",
+            reservas,
+            format_func=lambda reserva: (
+                f'{reserva["id"]} - {reserva["ambiente"]} - '
+                f'{reserva["data_reserva"]} - {reserva["hora_inicio"]} às {reserva["hora_fim"]}'
+            ),
+            key="select_editar_reserva"
+        )
+
+        reserva_completa = obter_reserva_por_id(reserva_selecionada["id"])
+
+        ids_ambientes = [ambiente["id"] for ambiente in ambientes]
+        indice_ambiente = ids_ambientes.index(reserva_completa["ambiente_id"])
+
+        with st.form("form_editar_reserva"):
+            ambiente = st.selectbox(
+                "Ambiente",
+                ambientes,
+                index=indice_ambiente,
+                format_func=lambda ambiente: ambiente["nome"]
+            )
+
+            turma = st.text_input("Turma", value=reserva_completa["turma"])
+            instrutor = st.text_input("Instrutor", value=reserva_completa["instrutor"])
+
+            unidade_curricular = st.text_input(
+                "Unidade curricular",
+                value=reserva_completa["unidade_curricular"] or ""
+            )
+
+            data_reserva = st.date_input(
+                "Data da reserva",
+                value=reserva_completa["data_reserva"]
+            )
+
+            hora_inicio = st.time_input(
+                "Horário de início",
+                value=reserva_completa["hora_inicio"]
+            )
+
+            hora_fim = st.time_input(
+                "Horário de término",
+                value=reserva_completa["hora_fim"]
+            )
+
+            finalidade = st.text_area(
+                "Finalidade",
+                value=reserva_completa["finalidade"]
+            )
+
+            botao_salvar = st.form_submit_button("Salvar alterações")
+
+            if botao_salvar:
+                if turma.strip() == "":
+                    st.error("Informe a turma.")
+                elif instrutor.strip() == "":
+                    st.error("Informe o instrutor.")
+                elif hora_fim <= hora_inicio:
+                    st.error("O horário de término deve ser maior que o horário de início.")
+                elif existe_conflito_reserva_edicao(
+                    reserva_id=reserva_completa["id"],
+                    ambiente_id=ambiente["id"],
+                    data_reserva=data_reserva,
+                    hora_inicio=hora_inicio,
+                    hora_fim=hora_fim
+                ):
+                    st.error("Conflito encontrado! Já existe outra reserva para esse ambiente nesse horário.")
+                else:
+                    try:
+                        atualizar_reserva(
+                            reserva_id=reserva_completa["id"],
+                            ambiente_id=ambiente["id"],
+                            turma=turma,
+                            instrutor=instrutor,
+                            unidade_curricular=unidade_curricular,
+                            data_reserva=data_reserva,
+                            hora_inicio=hora_inicio,
+                            hora_fim=hora_fim,
+                            finalidade=finalidade
+                        )
+
+                        st.success("Reserva atualizada com sucesso!")
+                        st.rerun()
+
+                    except Exception as erro:
+                        st.error("Erro ao atualizar reserva.")
+                        st.exception(erro)
+
+    with aba_excluir:
+        st.subheader("Excluir reserva")
+        st.warning("A exclusão de uma reserva remove o registro do banco de dados.")
+
+        reserva_excluir = st.selectbox(
+            "Selecione a reserva que deseja excluir",
+            reservas,
+            format_func=lambda reserva: (
+                f'{reserva["id"]} - {reserva["ambiente"]} - '
+                f'{reserva["data_reserva"]} - {reserva["hora_inicio"]} às {reserva["hora_fim"]}'
+            ),
+            key="select_excluir_reserva"
+        )
+
+        confirmar = st.checkbox(
+            "Confirmo que desejo excluir esta reserva.",
+            key="confirmar_excluir_reserva"
+        )
+
+        if st.button("Excluir reserva"):
+            if not confirmar:
+                st.error("Marque a confirmação antes de excluir.")
+            else:
+                try:
+                    excluir_reserva(reserva_excluir["id"])
+                    st.success("Reserva excluída com sucesso!")
+                    st.rerun()
+
+                except Exception as erro:
+                    st.error("Erro ao excluir reserva.")
+                    st.exception(erro)
 
 st.sidebar.title("Menu")
 
@@ -483,7 +783,9 @@ pagina = st.sidebar.radio(
     [
         "Página inicial",
         "Cadastro de ambientes",
+        "Gerenciar ambientes",
         "Cadastro de reservas",
+        "Gerenciar reservas",
         "Consulta de agenda",
         "Sugestão de ambiente",
         "Relatórios"
@@ -494,8 +796,12 @@ if pagina == "Página inicial":
     pagina_inicial()
 elif pagina == "Cadastro de ambientes":
     pagina_cadastro_ambientes()
+elif pagina == "Gerenciar ambientes":
+    pagina_gerenciar_ambientes()
 elif pagina == "Cadastro de reservas":
     pagina_cadastro_reservas()
+elif pagina == "Gerenciar reservas":
+    pagina_gerenciar_reservas()
 elif pagina == "Consulta de agenda":
     pagina_consulta_agenda()
 elif pagina == "Sugestão de ambiente":

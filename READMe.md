@@ -13,7 +13,7 @@ O projeto foi desenvolvido no contexto do **Desafio EPT 2026**, com estudantes d
 **Curso:** Ensino Médio Integrado ao Técnico em Inteligência Artificial  
 **Ano:** 2026  
 **Instrutor orientador:** Dieimes Nunes de Souza  
-**Unidades curriculares envolvidas:** Python e Banco de Dados  
+**Unidades curriculares envolvidas:** Desenvolvimento de banco de dados e Desenvolvimento de linguagem de programação Python
 **Banco de dados utilizado:** PostgreSQL  
 
 ---

@@ -2,23 +2,50 @@
 
 O **OrganizAI** é um protótipo de sistema para auxiliar a organização de salas de aula, laboratórios e outros ambientes do Senac Ivaiporã.
 
-O projeto está sendo desenvolvido por estudantes do **Ensino Médio Integrado ao Técnico em Inteligência Artificial**, com orientação do instrutor **Dieimes Nunes de Souza**, como proposta para o **Desafio EPT 2026**.
+O projeto foi desenvolvido no contexto do **Desafio EPT 2026**, com estudantes do **Ensino Médio Integrado ao Técnico em Inteligência Artificial**, integrando principalmente conhecimentos das unidades curriculares de **Python** e **Banco de Dados**.
+
+---
+
+## Identificação do projeto
+
+**Nome do projeto:** OrganizAI – Solução para Gestão de Salas e Laboratórios no Senac Ivaiporã  
+**Unidade:** Senac Ivaiporã  
+**Curso:** Ensino Médio Integrado ao Técnico em Inteligência Artificial  
+**Ano:** 2026  
+**Instrutor orientador:** Dieimes Nunes de Souza  
+**Unidades curriculares envolvidas:** Python e Banco de Dados  
+**Banco de dados utilizado:** PostgreSQL  
+
+---
+
+## Equipe do projeto
+
+O projeto OrganizAI foi desenvolvido com a participação dos seguintes estudantes:
+
+- Brayner Lohan de Jesus Dias dos Santos;
+- Christopher Barbosa Silveira;
+- Gabriel Rodrigues Lima Ronque;
+- Kauan Henrique Jesus de Oliveira;
+- Pablo Henrique de Rezende Salustiano;
+- Tainara Botelho Pereira.
+
+---
+
+## Links de entrega
+
+**Repositório GitHub:**  
+https://github.com/DieimesNunes/organizAI
+
+**Vídeo de apresentação:**  
+INSERIR AQUI O LINK DO VÍDEO
 
 ---
 
 ## Objetivo do projeto
 
-Desenvolver uma solução simples e funcional para:
+Desenvolver uma solução simples e funcional para apoiar a gestão de ambientes educacionais da unidade, permitindo cadastrar salas e laboratórios, registrar reservas, consultar agenda, evitar conflitos de horário, sugerir ambientes disponíveis e gerar relatórios básicos.
 
-- Cadastrar ambientes da unidade;
-- Registrar reservas de salas e laboratórios;
-- Consultar a agenda de uso dos ambientes;
-- Evitar conflitos de horário;
-- Sugerir ambientes disponíveis;
-- Gerar relatórios básicos;
-- Permitir edição e exclusão de ambientes e reservas.
-
-A proposta é aplicar conhecimentos de **Python** e **Banco de Dados** em um problema real do contexto educacional.
+A proposta busca aplicar conhecimentos de **programação em Python** e **banco de dados PostgreSQL** em uma situação real do contexto escolar.
 
 ---
 
@@ -29,67 +56,97 @@ Em uma unidade de ensino, diferentes turmas, instrutores e atividades precisam u
 Quando essas informações não estão centralizadas, podem ocorrer situações como:
 
 - dificuldade para saber quais ambientes estão disponíveis;
-- reservas conflitantes para o mesmo horário;
-- falta de histórico sobre o uso dos espaços;
-- dificuldade para escolher o ambiente mais adequado para cada aula;
-- necessidade de correção ou exclusão de registros cadastrados incorretamente.
+- possibilidade de reserva duplicada no mesmo horário;
+- falta de registro organizado sobre o uso dos espaços;
+- dificuldade para escolher o ambiente mais adequado para determinada aula;
+- necessidade de corrigir ou excluir informações cadastradas incorretamente.
+
+Diante dessa realidade, o OrganizAI foi pensado como uma solução simples para apoiar o registro, a consulta e a organização dessas informações.
 
 ---
 
 ## Solução proposta
 
-O OrganizAI propõe um sistema simples para apoiar a gestão desses ambientes.
+O OrganizAI propõe um sistema web simples, acessado pelo navegador, que permite organizar informações sobre ambientes e reservas.
 
-O sistema permite cadastrar ambientes, registrar reservas, consultar horários, identificar conflitos, sugerir ambientes disponíveis e visualizar relatórios.
+O sistema foi desenvolvido como um **protótipo educacional**, com foco em demonstrar uma solução funcional e viável para o problema identificado.
 
-Além disso, o sistema passou a contar com recursos de **edição e exclusão**, permitindo corrigir dados cadastrados ou remover registros quando necessário.
+A solução permite:
 
----
-
-## Tecnologias utilizadas
-
-- **Python:** linguagem principal do projeto;
-- **Streamlit:** criação da interface visual no navegador;
-- **PostgreSQL:** banco de dados utilizado para armazenar ambientes e reservas;
-- **Pandas:** organização e exibição dos dados em tabelas e relatórios;
-- **pgAdmin:** ferramenta visual para gerenciar o banco PostgreSQL;
-- **GitHub:** versionamento, organização e registro do desenvolvimento.
+- cadastrar ambientes da unidade;
+- consultar ambientes cadastrados;
+- editar dados de ambientes;
+- excluir ambientes, quando não houver reservas vinculadas;
+- cadastrar reservas;
+- consultar reservas cadastradas;
+- editar reservas;
+- excluir reservas;
+- verificar conflitos de horário;
+- sugerir ambientes disponíveis;
+- visualizar relatórios simples.
 
 ---
 
 ## Funcionalidades implementadas
 
-Até o momento, o protótipo possui:
+Até o momento, o protótipo possui as seguintes funcionalidades:
 
-- Tela inicial do sistema;
+- Tela inicial de apresentação do sistema;
 - Cadastro de ambientes;
-- Listagem de ambientes;
+- Listagem de ambientes cadastrados;
 - Edição de ambientes;
 - Exclusão de ambientes;
 - Cadastro de reservas;
-- Listagem de reservas;
+- Listagem de reservas cadastradas;
 - Edição de reservas;
 - Exclusão de reservas;
 - Consulta de agenda por ambiente e data;
-- Verificação de conflitos de horário;
-- Sugestão de ambiente disponível;
+- Verificação automática de conflitos de horário;
+- Sugestão de ambiente disponível com base em data, horário, capacidade e recursos necessários;
 - Relatórios simples de uso;
 - Integração com banco de dados PostgreSQL.
 
 ---
 
+## O que o sistema evita?
+
+Uma das funções mais importantes do OrganizAI é impedir conflitos de horário.
+
+Por exemplo:
+
+```text
+Se a Sala 03 já estiver reservada das 07h15 às 12h35,
+o sistema não deve permitir outra reserva para a mesma sala,
+na mesma data e dentro desse mesmo intervalo.
+```
+
+Essa regra ajuda a evitar duplicidade no uso dos ambientes.
+
+---
+
 ## O que significa CRUD no projeto?
 
-CRUD é uma sigla usada em sistemas para representar quatro operações básicas:
+CRUD é uma sigla utilizada em sistemas para representar quatro operações básicas:
 
-| Letra | Significado | No OrganizAI |
+| Operação | Significado | Aplicação no OrganizAI |
 |---|---|---|
-| C | Create | Cadastrar ambientes e reservas |
-| R | Read | Consultar/listar ambientes e reservas |
-| U | Update | Editar ambientes e reservas |
-| D | Delete | Excluir ambientes e reservas |
+| Create | Criar/cadastrar | Cadastrar ambientes e reservas |
+| Read | Ler/consultar | Listar ambientes, reservas e agenda |
+| Update | Atualizar/editar | Editar ambientes e reservas |
+| Delete | Excluir | Excluir ambientes e reservas |
 
 Com essas operações, o OrganizAI fica mais próximo de um sistema real, pois permite criar, consultar, corrigir e remover registros.
+
+---
+
+## Tecnologias utilizadas
+
+- **Python:** linguagem principal utilizada para desenvolver a lógica do sistema;
+- **Streamlit:** ferramenta utilizada para criar a interface visual no navegador;
+- **PostgreSQL:** banco de dados utilizado para armazenar ambientes e reservas;
+- **pgAdmin:** ferramenta utilizada para criar e gerenciar o banco PostgreSQL;
+- **Pandas:** biblioteca utilizada para organizar e exibir dados em tabelas e relatórios;
+- **GitHub:** plataforma utilizada para versionamento, organização e registro do desenvolvimento.
 
 ---
 
@@ -126,13 +183,11 @@ organizAI/
 
 ---
 
-## Descrição das principais pastas e arquivos
+## Descrição dos principais arquivos
 
 ### `app.py`
 
-Arquivo principal do sistema.
-
-Nele ficam as telas criadas com Streamlit, como:
+Arquivo principal do sistema. Nele ficam as telas criadas com Streamlit:
 
 - Página inicial;
 - Cadastro de ambientes;
@@ -143,58 +198,59 @@ Nele ficam as telas criadas com Streamlit, como:
 - Sugestão de ambiente;
 - Relatórios.
 
-### `src/`
+### `src/db.py`
 
-Pasta com os módulos Python responsáveis pela lógica do sistema.
+Arquivo responsável pela conexão entre o Python e o banco PostgreSQL.
 
-- `db.py`: realiza a conexão com o banco PostgreSQL;
-- `ambientes.py`: contém funções para cadastrar, listar, buscar, editar e excluir ambientes;
-- `reservas.py`: contém funções para cadastrar, listar, buscar, editar, excluir e verificar conflitos de reservas;
-- `sugestoes.py`: contém a lógica para sugerir ambientes disponíveis;
-- `relatorios.py`: contém consultas para gerar relatórios do sistema.
+### `src/ambientes.py`
 
-### `sql/`
+Contém as funções relacionadas aos ambientes, como:
 
-Pasta com os scripts SQL do projeto.
+- cadastrar ambiente;
+- listar ambientes;
+- buscar ambiente por ID;
+- editar ambiente;
+- excluir ambiente;
+- verificar se um ambiente possui reservas vinculadas.
 
-- `01_criar_tabelas.sql`: cria as tabelas do banco de dados;
-- `02_dados_exemplo.sql`: insere dados fictícios para testes.
+### `src/reservas.py`
 
-Esses arquivos são importantes porque permitem recriar o banco em outro computador.
+Contém as funções relacionadas às reservas, como:
 
-### `docs/`
+- cadastrar reserva;
+- listar reservas;
+- buscar reserva por ID;
+- editar reserva;
+- excluir reserva;
+- verificar conflitos de horário.
 
-Pasta com a documentação do projeto.
+### `src/sugestoes.py`
 
-- `relatorio_instrutor_senac.md`: relatório de acompanhamento do instrutor, com foco em prestação de contas pedagógica e técnica;
-- `diario_didatico_alunos.md`: material explicativo para os alunos entenderem o projeto;
-- `roteiro_video.md`: roteiro para organização do vídeo de apresentação.
+Contém a lógica para sugerir ambientes disponíveis de acordo com data, horário, capacidade mínima e recursos necessários.
 
-### `imagens/`
+### `src/relatorios.py`
 
-Pasta destinada aos prints e evidências visuais do desenvolvimento do protótipo.
+Contém consultas utilizadas para gerar relatórios simples, como total de ambientes, total de reservas, reservas por ambiente, ambientes por tipo e reservas por data.
+
+### `sql/01_criar_tabelas.sql`
+
+Script responsável pela criação das tabelas do banco de dados.
+
+### `sql/02_dados_exemplo.sql`
+
+Script com dados fictícios para testes e demonstração do sistema.
 
 ### `.env.example`
 
-Modelo de configuração das variáveis de ambiente necessárias para conexão com o banco de dados.
+Modelo de configuração do arquivo `.env`.
 
-Este arquivo pode ir para o GitHub, pois não contém senha real.
+Este arquivo pode ir para o GitHub porque não contém senha real.
 
 ### `.env`
 
 Arquivo local com as informações reais de conexão com o banco de dados.
 
-Este arquivo **não deve ser enviado ao GitHub**, pois pode conter senha do banco.
-
-Exemplo:
-
-```env
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=organizai_db
-DB_USER=postgres
-DB_PASSWORD=sua_senha_aqui
-```
+Este arquivo **não deve ser enviado ao GitHub**, pois pode conter senha.
 
 ---
 
@@ -202,7 +258,7 @@ DB_PASSWORD=sua_senha_aqui
 
 O projeto utiliza o banco **PostgreSQL**.
 
-Nome do banco utilizado no desenvolvimento:
+Nome do banco utilizado:
 
 ```text
 organizai_db
@@ -217,9 +273,9 @@ reservas
 
 A tabela `ambientes` armazena informações sobre salas, laboratórios e outros espaços.
 
-A tabela `reservas` armazena os registros de uso dos ambientes em determinada data e horário.
+A tabela `reservas` armazena informações sobre o uso desses ambientes em determinada data e horário.
 
-A tabela `reservas` se relaciona com a tabela `ambientes`, pois cada reserva pertence a um ambiente.
+Cada reserva fica vinculada a um ambiente, permitindo trabalhar conceitos de banco de dados como **chave primária**, **chave estrangeira** e **relacionamento entre tabelas**.
 
 ---
 
@@ -255,13 +311,13 @@ Quando o ambiente virtual estiver ativo, o terminal deve mostrar algo parecido c
 (.venv) PS C:\...\organizAI>
 ```
 
-Se o PowerShell bloquear a ativação, execute:
+Se o PowerShell bloquear a ativação, executar:
 
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
-Depois tente ativar novamente:
+Depois ativar novamente:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
@@ -276,13 +332,13 @@ python -m pip install -r requirements.txt
 
 ### 5. Criar o arquivo `.env`
 
-Na raiz do projeto, crie um arquivo chamado:
+Na raiz do projeto, criar um arquivo chamado:
 
 ```text
 .env
 ```
 
-Dentro dele, coloque:
+Dentro dele, colocar:
 
 ```env
 DB_HOST=localhost
@@ -350,15 +406,16 @@ Após abrir o sistema, recomenda-se testar nesta ordem:
 2. Cadastrar uma sala ou laboratório;
 3. Acessar **Gerenciar ambientes**;
 4. Editar um ambiente cadastrado;
-5. Cadastrar uma reserva em **Cadastro de reservas**;
-6. Acessar **Gerenciar reservas**;
-7. Editar uma reserva;
-8. Tentar cadastrar uma reserva conflitante;
-9. Verificar se o sistema bloqueia o conflito;
-10. Testar a **Sugestão de ambiente**;
-11. Abrir a tela de **Relatórios**;
-12. Excluir uma reserva de teste;
-13. Excluir um ambiente que não tenha reservas vinculadas.
+5. Tentar excluir um ambiente com reserva vinculada;
+6. Cadastrar uma reserva em **Cadastro de reservas**;
+7. Acessar **Gerenciar reservas**;
+8. Editar uma reserva;
+9. Tentar cadastrar uma reserva conflitante;
+10. Verificar se o sistema bloqueia o conflito;
+11. Testar a **Sugestão de ambiente**;
+12. Abrir a tela de **Relatórios**;
+13. Excluir uma reserva de teste;
+14. Excluir um ambiente sem reservas vinculadas.
 
 ---
 
@@ -366,7 +423,7 @@ Após abrir o sistema, recomenda-se testar nesta ordem:
 
 O sistema não deve permitir a exclusão de um ambiente que possui reservas vinculadas.
 
-Isso evita problemas no banco de dados, pois uma reserva precisa estar ligada a um ambiente existente.
+Essa regra evita inconsistência no banco de dados, pois uma reserva precisa estar associada a um ambiente existente.
 
 Exemplo:
 
@@ -401,19 +458,23 @@ O projeto possui uma versão funcional com:
 - Relatórios simples;
 - Integração com PostgreSQL;
 - Documentação de apoio;
-- Roteiro para apresentação.
+- Roteiro para apresentação;
+- Vídeo de apresentação do projeto.
 
 ---
 
-## Próximos passos
+## Possíveis melhorias futuras
 
-- Revisar o funcionamento do sistema com os alunos;
-- Testar o protótipo com dados fictícios;
-- Registrar prints e evidências;
-- Atualizar os materiais impressos, se necessário;
-- Ensaiar a apresentação;
-- Gravar o vídeo final do projeto;
-- Preparar o envio conforme as orientações do Desafio EPT 2026.
+Como o OrganizAI é um protótipo, algumas melhorias podem ser desenvolvidas futuramente, como:
+
+- criação de tela de login;
+- perfis de usuário;
+- exportação de relatórios;
+- filtros mais avançados;
+- painel administrativo;
+- publicação do sistema em servidor;
+- melhoria visual da interface;
+- integração com ferramentas institucionais.
 
 ---
 
@@ -421,4 +482,4 @@ O projeto possui uma versão funcional com:
 
 O OrganizAI é um protótipo educacional.
 
-Ele foi criado para demonstrar como conhecimentos de Python e Banco de Dados podem ser aplicados na resolução de um problema real: a organização de salas e laboratórios do Senac Ivaiporã.
+Ele demonstra como conhecimentos de **Python** e **Banco de Dados** podem ser aplicados para resolver um problema real: a organização de salas e laboratórios do Senac Ivaiporã.

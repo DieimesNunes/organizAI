@@ -29,18 +29,6 @@ O projeto OrganizAI foi desenvolvido com a participação dos seguintes estudant
 - Pablo Henrique de Rezende Salustiano;
 - Tainara Botelho Pereira.
 
----
-
-## Links de entrega
-
-**Repositório GitHub:**  
-https://github.com/DieimesNunes/organizAI
-
-**Vídeo de apresentação:**  
-INSERIR AQUI O LINK DO VÍDEO
-
----
-
 ## Objetivo do projeto
 
 Desenvolver uma solução simples e funcional para apoiar a gestão de ambientes educacionais da unidade, permitindo cadastrar salas e laboratórios, registrar reservas, consultar agenda, evitar conflitos de horário, sugerir ambientes disponíveis e gerar relatórios básicos.
